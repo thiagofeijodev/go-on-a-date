@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 const app = express();
 
@@ -9,8 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Direct transport: resolves recipient's MX record and delivers without any SMTP credentials
-const transporter = nodemailer.createTransport({ direct: true });
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const ALLOWED_TIMES = ['17:00', '18:00', '19:00', '20:00'];
 const ALLOWED_FOODS = ['pizza', 'sushi', 'burgers', 'pasta', 'tacos', 'ramen'];
@@ -48,7 +47,7 @@ app.post('/api/respond', async (req, res) => {
   const foodLabel = foodType.charAt(0).toUpperCase() + foodType.slice(1);
 
   try {
-    await transporter.sendMail({
+    await resend.emails.send({
       from: 'Go on a Date <noreply@go-on-a-date.app>',
       to: inviterEmail,
       subject: 'Someone said YES to your date! 🥂',
