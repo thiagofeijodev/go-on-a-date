@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+*.local
+
+# MySQL local bind mount (if used)
+mysql-data/
+
+# OS
+.DS_Store
+Thumbs.db
