@@ -19,7 +19,8 @@ export default function Home() {
       return;
     }
     const token = encodeInvite({ email, start, end });
-    setShareUrl(`${window.location.origin}/invite/${token}`);
+    const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+    setShareUrl(`${window.location.origin}${base}/#/invite/${token}`);
   }
 
   function handleCopy() {
