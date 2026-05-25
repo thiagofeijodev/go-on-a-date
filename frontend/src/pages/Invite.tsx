@@ -84,15 +84,15 @@ export default function Invite() {
               Would you like to go on a date with me?
             </h1>
             <p className="text-rose-400 mb-12">Choose carefully... or don't.</p>
-            <div className="flex justify-center">
+            <div className="flex gap-6 justify-center items-center">
               <button
                 onClick={() => setStep(1)}
                 className="px-10 py-4 rounded-full bg-rose-400 text-white font-semibold text-xl shadow-lg hover:bg-rose-500 transition-colors"
               >
                 Yes! 💕
               </button>
+              <MovingButton />
             </div>
-            <MovingButton />
           </div>
         </StepTransition>
       )}
