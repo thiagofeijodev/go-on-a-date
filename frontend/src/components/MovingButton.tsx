@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { safeRandomPos } from './movingButtonPos';
 
 export default function MovingButton() {
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -9,24 +10,11 @@ export default function MovingButton() {
     const btn = btnRef.current;
     if (!btn) return null;
 
-    const margin = 16;
-    // getBoundingClientRect gives the real rendered size regardless of position type
     const { width: btnW, height: btnH } = btn.getBoundingClientRect();
-    // Fall back to offsetWidth/Height if rect is zero (before first paint)
     const w = btnW || btn.offsetWidth;
     const h = btnH || btn.offsetHeight;
 
-    const vh = window.innerHeight;
-    const vw = window.innerWidth;
-
-    const top  = margin + Math.random() * Math.max(0, vh - h - margin * 2);
-    const left = margin + Math.random() * Math.max(0, vw - w - margin * 2);
-
-    // Hard clamp so the bottom/right edges can never exceed the viewport
-    return {
-      top:  Math.min(top,  vh - h - margin),
-      left: Math.min(left, vw - w - margin),
-    };
+    return safeRandomPos(w, h, window.innerWidth, window.innerHeight);
   }
 
   function dodge() {
