@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api' });
+// In production, set VITE_API_URL to your backend URL e.g. https://api.yourdomain.com
+// In development with the Vite proxy active, leave it unset and the proxy handles /api
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api',
+});
 
 export interface RespondPayload {
   inviterEmail: string;

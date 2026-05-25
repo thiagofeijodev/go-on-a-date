@@ -5,18 +5,12 @@ import nodemailer from 'nodemailer';
 
 const app = express();
 
-app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173' }));
+// Allow any origin — no auth or cookies involved
+app.use(cors());
 app.use(express.json());
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+// Direct transport: resolves recipient's MX record and delivers without any SMTP credentials
+const transporter = nodemailer.createTransport({ direct: true });
 
 const ALLOWED_TIMES = ['17:00', '18:00', '19:00', '20:00'];
 const ALLOWED_FOODS = ['pizza', 'sushi', 'burgers', 'pasta', 'tacos', 'ramen'];
@@ -51,10 +45,11 @@ app.post('/api/respond', async (req, res) => {
   const emoji = FOOD_EMOJI[foodType] ?? '';
   const timeLabel = TIME_LABELS[selectedTime];
   const dateLabel = formatDate(selectedDate);
+  const foodLabel = foodType.charAt(0).toUpperCase() + foodType.slice(1);
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      from: 'Go on a Date <noreply@go-on-a-date.app>',
       to: inviterEmail,
       subject: 'Someone said YES to your date! 🥂',
       html: `
@@ -65,15 +60,9 @@ app.post('/api/respond', async (req, res) => {
             Your invitation was accepted. Here's what they chose:
           </p>
           <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-            <p style="margin: 0 0 12px; color: #9f1239; font-size: 16px;">
-              📅 <strong>${dateLabel}</strong>
-            </p>
-            <p style="margin: 0 0 12px; color: #9f1239; font-size: 16px;">
-              ⏰ <strong>${timeLabel}</strong>
-            </p>
-            <p style="margin: 0; color: #9f1239; font-size: 16px;">
-              ${emoji} <strong>${foodType.charAt(0).toUpperCase() + foodType.slice(1)}</strong>
-            </p>
+            <p style="margin: 0 0 12px; color: #9f1239; font-size: 16px;">📅 <strong>${dateLabel}</strong></p>
+            <p style="margin: 0 0 12px; color: #9f1239; font-size: 16px;">⏰ <strong>${timeLabel}</strong></p>
+            <p style="margin: 0; color: #9f1239; font-size: 16px;">${emoji} <strong>${foodLabel}</strong></p>
           </div>
           <p style="color: #fb7185; text-align: center; font-style: italic; margin: 0;">
             Get ready for a wonderful time! 💕
