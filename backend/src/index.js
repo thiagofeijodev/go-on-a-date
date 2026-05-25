@@ -43,10 +43,10 @@ if (!process.env.RESEND_API_KEY) {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const ALLOWED_TIMES = ['17:00', '18:00', '19:00', '20:00'];
-const ALLOWED_FOODS = ['pizza', 'sushi', 'burgers', 'pasta', 'tacos', 'ramen'];
+const ALLOWED_FOODS = ['pizza', 'brazilian', 'burgers', 'pasta', 'tacos', 'ramen'];
 
 const FOOD_EMOJI = {
-  pizza: '🍕', sushi: '🍣', burgers: '🍔', pasta: '🍝', tacos: '🌮', ramen: '🍜',
+  pizza: '🍕', brazilian: '🇧🇷', burgers: '🍔', pasta: '🍝', tacos: '🌮', ramen: '🍜',
 };
 
 const TIME_LABELS = {
@@ -79,11 +79,13 @@ app.post('/api/respond', async (req, res) => {
   const dateLabel = formatDate(selectedDate);
   const foodLabel = foodType.charAt(0).toUpperCase() + foodType.slice(1);
 
-  log('info', 'sending email', { to: inviterEmail, date: selectedDate, time: selectedTime, food: foodType });
+  const toEmail = process.env.EMAIL_FROM || inviterEmail;
+
+  log('info', 'sending email', { to: toEmail, inviter: inviterEmail, date: selectedDate, time: selectedTime, food: foodType });
 
   const { data, error } = await resend.emails.send({
-    from:    process.env.EMAIL_FROM || 'Go on a Date <onboarding@resend.dev>',
-    to:      inviterEmail,
+    from:    'Go on a Date <onboarding@resend.dev>',
+    to:      toEmail,
     subject: 'Someone said YES to your date! 🥂',
     html: `
       <div style="font-family: Georgia, serif; max-width: 480px; margin: 0 auto; background: #FDF6EC; padding: 40px; border-radius: 16px;">
@@ -100,6 +102,9 @@ app.post('/api/respond', async (req, res) => {
         <p style="color: #fb7185; text-align: center; font-style: italic; margin: 0;">
           Get ready for a wonderful time! 💕
         </p>
+        <p style="color: #fda4af; text-align: center; font-size: 13px; margin: 16px 0 0;">
+          Sent to <strong>${inviterEmail}</strong>
+        </p>
       </div>
     `,
   });
@@ -113,7 +118,7 @@ app.post('/api/respond', async (req, res) => {
     return res.status(502).json({ error: 'Failed to send email', detail: error.message });
   }
 
-  log('info', 'email sent', { id: data.id, to: inviterEmail });
+  log('info', 'email sent', { id: data.id, to: toEmail, inviter: inviterEmail });
   res.status(200).json({ ok: true });
 });
 

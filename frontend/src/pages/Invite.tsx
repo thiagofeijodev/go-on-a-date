@@ -14,7 +14,7 @@ const TIMES = [
 
 const FOODS = [
   { emoji: '🍕', label: 'pizza', value: 'pizza' },
-  { emoji: '🍣', label: 'sushi', value: 'sushi' },
+  { emoji: '🇧🇷', label: 'brazilian', value: 'brazilian' },
   { emoji: '🍔', label: 'burgers', value: 'burgers' },
   { emoji: '🍝', label: 'pasta', value: 'pasta' },
   { emoji: '🌮', label: 'tacos', value: 'tacos' },
