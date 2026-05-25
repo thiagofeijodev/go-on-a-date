@@ -47,4 +47,14 @@ describe('safeRandomPos', () => {
       expect(left + btnW).toBeLessThanOrEqual(vw - MARGIN);
     }
   });
+
+  it('bottom edge never exceeds viewport when button height is at its real size (regression: h=0 clamp bug)', () => {
+    // If h were misread as 0, the clamp would allow top up to vh-MARGIN,
+    // and the real 48px button would overflow by ~48px. This test uses real h.
+    const btnH = 48, btnW = 130, vw = 1280, vh = 800;
+    for (let i = 0; i < RUNS; i++) {
+      const { top } = safeRandomPos(btnW, btnH, vw, vh);
+      expect(top + btnH).toBeLessThanOrEqual(vh - MARGIN);
+    }
+  });
 });

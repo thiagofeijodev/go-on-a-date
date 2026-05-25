@@ -1,36 +1,34 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useLayoutEffect } from 'react';
 import { safeRandomPos } from './movingButtonPos';
 
 export default function MovingButton() {
   const btnRef = useRef<HTMLButtonElement>(null);
+  const dims   = useRef({ w: 0, h: 0 });
   const [escaped, setEscaped] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
 
-  function randomPos() {
-    const btn = btnRef.current;
-    if (!btn) return null;
-
-    const { width: btnW, height: btnH } = btn.getBoundingClientRect();
-    const w = btnW || btn.offsetWidth;
-    const h = btnH || btn.offsetHeight;
-
-    return safeRandomPos(w, h, window.innerWidth, window.innerHeight);
-  }
+  // Measure once after the button is in the DOM and laid out.
+  // useLayoutEffect fires synchronously after layout, before paint,
+  // so getBoundingClientRect is always non-zero here.
+  useLayoutEffect(() => {
+    if (btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      dims.current = { w: r.width, h: r.height };
+    }
+  }, []);
 
   function dodge() {
-    const p = randomPos();
-    if (p) setPos(p);
+    const { w, h } = dims.current;
+    if (!w || !h) return;
+    const p = safeRandomPos(w, h, window.innerWidth, window.innerHeight);
+    setPos(p);
   }
 
   function handleMouseEnter() {
     if (!escaped) {
-      const p = randomPos();
-      if (!p) return;
       setEscaped(true);
-      setPos(p);
-    } else {
-      dodge();
     }
+    dodge();
   }
 
   return (
