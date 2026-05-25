@@ -8,15 +8,24 @@ export default function MovingButton() {
   function randomPos() {
     const btn = btnRef.current;
     if (!btn) return null;
-    const margin = 12;
-    const btnW = btn.offsetWidth;
-    const btnH = btn.offsetHeight;
-    // top is clamped so top >= margin and top + btnH <= innerHeight - margin
-    const maxTop = Math.max(0, window.innerHeight - btnH - margin);
-    const maxLeft = Math.max(0, window.innerWidth - btnW - margin);
+
+    const margin = 16;
+    // getBoundingClientRect gives the real rendered size regardless of position type
+    const { width: btnW, height: btnH } = btn.getBoundingClientRect();
+    // Fall back to offsetWidth/Height if rect is zero (before first paint)
+    const w = btnW || btn.offsetWidth;
+    const h = btnH || btn.offsetHeight;
+
+    const vh = window.innerHeight;
+    const vw = window.innerWidth;
+
+    const top  = margin + Math.random() * Math.max(0, vh - h - margin * 2);
+    const left = margin + Math.random() * Math.max(0, vw - w - margin * 2);
+
+    // Hard clamp so the bottom/right edges can never exceed the viewport
     return {
-      top: margin + Math.random() * (maxTop - margin),
-      left: margin + Math.random() * (maxLeft - margin),
+      top:  Math.min(top,  vh - h - margin),
+      left: Math.min(left, vw - w - margin),
     };
   }
 
